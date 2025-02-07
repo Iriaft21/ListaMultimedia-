@@ -5,24 +5,45 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 public class DialogoVideo extends DialogFragment {
 
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    private Multimedia multimedia;
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         //Construimos el dialogo
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         //Inflamos el layout
         LayoutInflater layoutInflater = requireActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.layoutvideo, null);
 
+        Bundle bundle = getArguments();
+        if(bundle != null){
+            multimedia = (Multimedia) bundle.getSerializable("multimedia");
+        }
+
+        TextView nombre = view.findViewById(R.id.txt_nombre);
+        nombre.setText(multimedia.getNombre());
+        TextView tipo = view.findViewById(R.id.txt_tipo);
+        tipo.setText("Tipo de multimedia: " + multimedia.getTipo());
 
         VideoView videoView = view.findViewById(R.id.videoView);
-        //Aqui le pasamos el nombre del video
-        //videoView.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.dados);
+        videoView.setVideoPath("android.resource://" + getActivity().getPackageName() + "/" + multimedia.getRuta());
+
+        MediaController mediaController = new MediaController(getActivity());
+        //mediaController.setAnchorView(videoView);
+        mediaController.setMediaPlayer(videoView);
+        videoView.setMediaController(mediaController);
         videoView.start();
 
         Button cerrar =view.findViewById(R.id.btn_cerrar);
